@@ -4,7 +4,7 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -112,6 +112,77 @@ class ImageTests(unittest.TestCase):
             (out / "old.bin").touch()
             with self.assertRaises(ValueError):
                 build.collect(Path("/unused"), {}, {}, out)
+
+
+class ElfTests(unittest.TestCase):
+    target = {"flash_start": 0x0800C000, "flash_end": 0x08100000}
+
+    def section(self, address=0x0800C000, offset=0xC000, size=512, flags=2, kind="SHT_PROGBITS"):
+        return dict(sh_addr=address, sh_offset=offset, sh_size=size, sh_flags=flags, sh_type=kind)
+
+    def segment(self, physical=0x08000000, virtual=0x08000000, offset=0, size=0xC200):
+        return dict(p_type="PT_LOAD", p_paddr=physical, p_vaddr=virtual, p_offset=offset, p_filesz=size)
+
+    def check(self, sections, segments=None):
+        image = Mock()
+        image.iter_sections.return_value = sections
+        image.iter_segments.return_value = segments if segments is not None else [self.segment()]
+        return build.check_elf_layout(image, self.target)
+
+    def test_header_padding_is_not_firmware(self):
+        result = self.check([self.section()])
+        self.assertEqual(result["flash_end_used"], 0x0800C200)
+
+    def test_actual_bootloader_overlap_rejected(self):
+        with self.assertRaisesRegex(ValueError, "wrong flash address"):
+            self.check([self.section(), self.section(address=0x08000000, offset=0, size=64)])
+
+    def test_wrong_start_rejected(self):
+        with self.assertRaisesRegex(ValueError, "wrong flash address"):
+            self.check([self.section(address=0x0800C100, offset=0xC100, size=256)])
+
+    def test_data_uses_flash_load_address_not_ram_address(self):
+        sections = [self.section(), self.section(address=0x20000000, offset=0x10000, size=128)]
+        segments = [self.segment(), self.segment(physical=0x0800C200, virtual=0x20000000,
+                                                offset=0x10000, size=128)]
+        self.assertEqual(self.check(sections, segments)["flash_end_used"], 0x0800C280)
+
+    def test_nobits_and_debug_do_not_consume_firmware_flash(self):
+        sections = [self.section(), self.section(address=0x080F0000, kind="SHT_NOBITS"),
+                    self.section(address=0, flags=0)]
+        self.assertEqual(self.check(sections)["flash_end_used"], 0x0800C200)
+
+    def test_missing_or_ambiguous_mapping_rejected(self):
+        for segments in ([], [self.segment(), self.segment()]):
+            with self.assertRaisesRegex(ValueError, "load mapping"):
+                self.check([self.section()], segments)
+
+    def test_flash_overflow_and_low_headroom_rejected(self):
+        for size in (0x100001 - 0xC000, 0x100000 - 0xC000 - 8192):
+            with self.assertRaises(ValueError):
+                self.check([self.section(size=size)], [self.segment(size=0xC000 + size)])
+
+    def test_no_firmware_rejected(self):
+        with self.assertRaisesRegex(ValueError, "wrong flash address"):
+            self.check([])
+
+    def test_elf_binary_agreement_and_erased_gap_fill(self):
+        def objcopy(*args):
+            self.assertEqual(args[1:5], ("-O", "binary", "--gap-fill", "0xFF"))
+            Path(args[-1]).write_bytes(b"matching firmware")
+        with tempfile.TemporaryDirectory() as tmp:
+            binary = Path(tmp) / "firmware.bin"
+            binary.write_bytes(b"matching firmware")
+            with patch.object(build, "run", side_effect=objcopy):
+                build.verify_elf_binary(Path("firmware.elf"), binary)
+
+    def test_elf_binary_mismatch_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            binary = Path(tmp) / "firmware.bin"
+            binary.write_bytes(b"firmware")
+            with patch.object(build, "run", side_effect=lambda *args: Path(args[-1]).write_bytes(b"wrong")):
+                with self.assertRaisesRegex(ValueError, "ELF and binary disagree"):
+                    build.verify_elf_binary(Path("firmware.elf"), binary)
 
 
 class BoardTests(unittest.TestCase):

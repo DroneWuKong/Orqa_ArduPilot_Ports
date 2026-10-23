@@ -32,3 +32,14 @@ firmware families. H7/F405 upstream motor/timer maps and flight algorithms are
 not rewritten to mirror PX4; the RTOS/drivers and firmware conventions differ.
 Hardware axes, storage retention, UART, DMA and power-loss behavior remain
 unqualified. These changes are AI-assisted and should receive human review.
+
+## Artifact layout validation
+
+The pinned F405 linker emits a PT_LOAD segment at 0x08000000 containing ELF
+headers/padding, but its first allocated firmware section (`startup`) is at
+0x0800C000. Validation therefore checks file-backed allocated section load
+addresses, including RAM `.data` initializers stored in flash, rather than
+mistaking segment padding for bootloader overlap. NOBITS reservations and debug
+sections are not firmware bytes. Actual sections below the application offset,
+ambiguous mappings, overflow and insufficient headroom still fail validation.
+The decoded APJ must match the BIN, and objcopy of the ELF must also match it.

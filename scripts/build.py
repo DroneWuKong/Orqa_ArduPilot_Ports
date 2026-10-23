@@ -113,17 +113,45 @@ def validate_image(data, target):
 def check_elf(elf, target):
     from elftools.elf.elffile import ELFFile
     with elf.open("rb") as stream:
-        image = ELFFile(stream)
-        segments = [s for s in image.iter_segments() if s["p_type"] == "PT_LOAD" and s["p_filesz"]
-                    and 0x08000000 <= s["p_paddr"] < 0x09000000]
-        if not segments or min(s["p_paddr"] for s in segments) != target["flash_start"]:
-            raise ValueError("ELF linked at wrong flash address")
-        end = max(s["p_paddr"] + s["p_filesz"] for s in segments)
-        if end > target["flash_end"]:
-            raise ValueError("ELF exceeds physical flash")
-        if target["flash_end"] - end < 16 * 1024:
-            raise ValueError("Less than 16 KiB physical flash headroom; review feature/flash budget")
-        return {"flash_end_used": end, "physical_flash_free": target["flash_end"] - end}
+        return check_elf_layout(ELFFile(stream), target)
+
+
+def check_elf_layout(image, target):
+    # GNU ld can include ELF headers/padding in PT_LOAD before the first
+    # firmware section (F405: segment 0x08000000, startup 0x0800c000).
+    # objcopy emits allocated, file-backed sections, not that header padding.
+    segments = [s for s in image.iter_segments() if s["p_type"] == "PT_LOAD" and s["p_filesz"]]
+    ranges = []
+    for section in image.iter_sections():
+        if not section["sh_flags"] & 2 or section["sh_type"] == "SHT_NOBITS" or not section["sh_size"]:
+            continue
+        containing = [s for s in segments
+                      if s["p_offset"] <= section["sh_offset"]
+                      and section["sh_offset"] + section["sh_size"] <= s["p_offset"] + s["p_filesz"]
+                      and section["sh_addr"] == s["p_vaddr"] + section["sh_offset"] - s["p_offset"]]
+        if len(containing) != 1:
+            raise ValueError("ELF section has missing or ambiguous load mapping")
+        segment = containing[0]
+        address = segment["p_paddr"] + section["sh_offset"] - segment["p_offset"]
+        if 0x08000000 <= address < 0x09000000:
+            ranges.append((address, address + section["sh_size"]))
+    if not ranges or min(start for start, end in ranges) != target["flash_start"]:
+        raise ValueError("ELF linked at wrong flash address")
+    end = max(end for start, end in ranges)
+    if end > target["flash_end"]:
+        raise ValueError("ELF exceeds physical flash")
+    if target["flash_end"] - end < 16 * 1024:
+        raise ValueError("Less than 16 KiB physical flash headroom; review feature/flash budget")
+    return {"flash_end_used": end, "physical_flash_free": target["flash_end"] - end}
+
+
+def verify_elf_binary(elf, binary):
+    with tempfile.TemporaryDirectory() as tmp:
+        decoded = Path(tmp) / "elf.bin"
+        # Match ArduPilot's generate_bin task: erased-flash fill between sections.
+        run("arm-none-eabi-objcopy", "-O", "binary", "--gap-fill", "0xFF", elf, decoded)
+        if decoded.read_bytes() != binary.read_bytes():
+            raise ValueError("ELF and binary disagree")
 
 
 def collect(source, target, config, out):
@@ -160,6 +188,7 @@ def collect(source, target, config, out):
             raise ValueError("APJ board ID or image size mismatch")
         if raw != binary.read_bytes():
             raise ValueError("APJ and binary disagree")
+        verify_elf_binary(elf, binary)
         originals = [binary, bundle, elf]
     data = binary.read_bytes()
     validate_image(data, target)
