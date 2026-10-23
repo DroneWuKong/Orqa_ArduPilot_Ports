@@ -1,0 +1,14 @@
+diff --git a/Tools/AP_Bootloader/board_types.txt b/Tools/AP_Bootloader/board_types.txt
+index 5d6ceb1..589a38a 100644
+--- a/Tools/AP_Bootloader/board_types.txt
++++ b/Tools/AP_Bootloader/board_types.txt
+@@ -308,6 +308,9 @@ AP_HW_3DRControlN1                   1186
+ AP_HW_CORVON405V2_1                  1187
+ AP_HW_NarinH5                        1188
+ AP_HW_CORVON743V1                    1189
++# Downstream compatibility alias ONLY: legacy Orqa APB factory bootloader.
++# This collides with CORVON743V1; never treat 1189 alone as board identity.
++AP_HW_ORQAAPB_FACTORY                1189
+ AP_HW_DAKEFPVF405                    1190
+ AP_HW_ORBITH743                      1191
+ AP_HW_TMOTOR-PACER-H743              1192

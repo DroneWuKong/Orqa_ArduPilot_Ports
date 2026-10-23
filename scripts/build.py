@@ -44,7 +44,8 @@ def prepare(source, config):
     verify_revision(source, config)
     if config["kind"] == "ardupilot":
         modules = ["modules/ChibiOS", "modules/waf", "modules/mavlink",
-                   "modules/DroneCAN", "modules/gtest", "modules/littlefs", "modules/lwip"]
+                   "modules/DroneCAN", "modules/gtest", "modules/littlefs", "modules/lwip",
+                   "modules/CrashDebug"]
     else:
         modules = ["src/config", "lib/modules/dronecan/libcanard"]
     run("git", "submodule", "update", "--init", "--recursive", "--depth", "1", *modules, cwd=source)
@@ -98,7 +99,12 @@ def validate_image(data, target):
     if len(data) < 256 or len(data) > capacity:
         raise ValueError("Empty, truncated or oversized firmware")
     stack, reset = struct.unpack_from("<II", data)
-    if not (0x20000000 <= stack <= 0x24080000 or 0x30000000 <= stack <= 0x30048000):
+    ranges = [(0x20000000, 0x20020000)]
+    if target["flash_end"] == 0x08100000:  # STM32F405 CCM stack
+        ranges.append((0x10000000, 0x10010000))
+    else:  # STM32H743 DTCM / AXI SRAM / D2 SRAM
+        ranges.extend([(0x24000000, 0x24080000), (0x30000000, 0x30048000)])
+    if stack % 8 or not any(start < stack <= end for start, end in ranges):
         raise ValueError("Invalid initial stack pointer")
     if not reset & 1 or not target["flash_start"] <= (reset & ~1) < target["flash_end"]:
         raise ValueError("Invalid reset vector / wrong flash offset")

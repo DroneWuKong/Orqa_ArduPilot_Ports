@@ -59,6 +59,12 @@ A raw .bin is not a complete image to flash at 0x08000000. Existing vendor
 bootloaders with other private IDs require investigation, not forced uploads.
 No replacement bootloaders or with_bl.hex files are produced here.
 
+**APB ID warning:** Orqa's factory ID 1189 now collides with upstream
+CORVON743V1. Our clearly named downstream factory alias preserves compatibility;
+it is not a new registered allocation. Verify the physical APB, USB identity
+0x35b6:0x0090, sensor population and flash layout as well as the number.
+Never load an APB image onto another board just because its ID is 1189.
+
 ## Build (Linux x86_64)
 
 Pinned stable base: Copter/Plane 4.7.2 at the same upstream commit.

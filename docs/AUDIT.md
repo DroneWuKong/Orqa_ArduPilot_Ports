@@ -21,6 +21,12 @@ and split the later ICM42688P rotation into a separately named variant.
 AP_BOOTLOADER_FLASHING_ENABLED=0 is intentional: the APB application uses the
 existing factory bootloader and this project supplies no replacement binary.
 
+The upstream CI generator requires symbolic board IDs. A downstream-only
+AP_HW_ORQAAPB_FACTORY alias retains factory 1189 without disabling that check.
+Upstream now uses 1189 for CORVON743V1; this collision is explicitly documented,
+not presented as a registered Orqa allocation. Resolve a new upstream allocation
+with maintainers before distributing any new APB bootloader.
+
 The stock APB motor ordering is retained, including differences from other
 firmware families. H7/F405 upstream motor/timer maps and flight algorithms are
 not rewritten to mirror PX4; the RTOS/drivers and firmware conventions differ.

@@ -122,7 +122,7 @@ class BoardTests(unittest.TestCase):
         else:
             apb = (ROOT / "boards/OrqaAPB/hwdef.dat").read_text()
             later = (ROOT / "boards/OrqaAPB-ICM42688/hwdef.dat").read_text()
-            self.assertIn("APJ_BOARD_ID 1189", apb)
+            self.assertIn("APJ_BOARD_ID AP_HW_ORQAAPB_FACTORY", apb)
             self.assertNotIn("SDMMC", apb)
             self.assertIn("Backend_Type::BLOCK", apb)
             self.assertNotIn("Backend_Type::FILESYSTEM", apb)
