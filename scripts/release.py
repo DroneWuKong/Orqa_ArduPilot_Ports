@@ -70,9 +70,14 @@ def main():
                                for p in sorted(assets)))
         source = folder / "port-source.tar.gz"
         subprocess.run(["git", "archive", "--format=tar.gz", "--output", str(source), revision], check=True)
+        companion = folder / "companion-apb.tar.gz"
+        subprocess.run(["git", "archive", "--format=tar.gz", "--prefix=companion-apb/",
+                        "--output", str(companion), revision + ":companion/apb"], check=True)
         with sums.open("a") as out:
             out.write(f"{hashlib.sha256(source.read_bytes()).hexdigest()}  {source.name}\n")
+            out.write(f"{hashlib.sha256(companion.read_bytes()).hexdigest()}  {companion.name}\n")
         gh("release", "create", args.tag, *map(str, assets), str(sums), str(source),
+           str(companion),
            "--repo", repo, "--target", revision, "--prerelease",
            "--title", "Orqa firmware " + args.tag,
            "--notes", "Hardware-unvalidated bench-test firmware. Never flash a mismatched board or sensor variant.\n\n"

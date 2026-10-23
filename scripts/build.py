@@ -200,7 +200,7 @@ def collect(source, target, config, out):
         shutil.copy2(original, dest)
         hashes[dest.name] = digest(dest)
     inputs = {}
-    for folder in ("boards", "configs", "patches", "scripts"):
+    for folder in ("boards", "configs", "patches", "scripts", "companion"):
         for path in sorted((ROOT / folder).rglob("*")):
             if path.is_file() and "__pycache__" not in path.parts:
                 inputs[str(path.relative_to(ROOT))] = digest(path)

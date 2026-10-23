@@ -43,3 +43,14 @@ mistaking segment padding for bootloader overlap. NOBITS reservations and debug
 sections are not firmware bytes. Actual sections below the application offset,
 ambiguous mappings, overflow and insufficient headroom still fail validation.
 The decoded APJ must match the BIN, and objcopy of the ELF must also match it.
+
+## Companion integration
+
+The APB package now implements the pinned upstream MAVLink DataFlash stream
+and LOG_* download protocols. Live data is acknowledged only after fsync;
+post-flight archives require two identical full reads and a stable inventory.
+The SD-only mount repair derives from this account's PX4 APB implementation,
+but the recorder is protocol-specific, not a renamed ULog service. Block-only
+logging remains the firmware default because enabling MAVLink logging without
+a receiver can fail the upstream logging/prearm check. Runtime installation,
+rollback and remaining physical acceptance are in companion/apb/README.md.

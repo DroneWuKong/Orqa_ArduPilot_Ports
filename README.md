@@ -34,6 +34,8 @@ then verify physical axes. H7 upstream sensor assumptions remain unchanged.
 - Give APB's i.MX UART4 a 230400-baud default; saved parameters are not reset.
 - Default APB logging to the onboard W25 block backend instead of a nonexistent
   STM32 filesystem. The microSD remains Linux-owned.
+- Supply an SD-guarded i.MX live DataFlash recorder and verified post-flight
+  recovery, with durable ACKs, retransmission handling and install/rollback tools.
 - Separate sensor-population variants; preserve the factory APB bootloader
   rather than embedding an unverified replacement.
 - Check source/compiler pins, APJ identity, APJ/BIN/ELF agreement, vectors
@@ -45,10 +47,15 @@ Details: [audit/provenance](docs/AUDIT.md), [bench checks](docs/TESTING.md),
 
 ## Downloads and flashing
 
-Download firmware-<build-ID> from a [successful Actions run](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/actions/workflows/build.yml).
+Persistent downloads: [v0.1.0-rc1 prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc1).
+Choose the matching `.apj`; download `companion-apb.tar.gz` for the APB Linux
+logging package and `SHA256SUMS` for verification. These are bench-test builds,
+not hardware-qualified releases.
+
+Alternatively download firmware-<build-ID> from a [successful Actions run](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/actions/workflows/build.yml).
 Artifacts require sign-in and expire after 30 days.
 [Tagged prereleases](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases)
-are published only by manual approval; this link does not imply one exists.
+are published only by manual approval.
 
 Use the matching .apj in Mission Planner or another compatible uploader.
 Each artifact also includes .bin, .elf, a manifest and SHA256SUMS. Back up settings,
@@ -73,7 +80,7 @@ Exact compiler, source and targets: [upstream.lock.json](upstream.lock.json).
 ~~~sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install -r requirements-build.txt
+pip install -r requirements-build.txt -r companion/apb/requirements.txt
 python scripts/build.py toolchain work/tools
 export PATH="$PWD/work/tools/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 python scripts/build.py prepare work/ardupilot
@@ -95,6 +102,10 @@ logging is finite (16 MiB chip) and is not an unlimited SD archive.
 Check LOG_BACKEND_TYPE on an existing installation: defaults do not override
 saved values. Retrieve logs through the ground station before they are recycled.
 
-The PX4 companion ULog package is not an ArduPilot logging solution. Companion
-DataFlash capture, bandwidth and SD recovery still need a separate integration.
-No successful physical persistence or logging test is claimed by compilation.
+The [APB companion package](companion/apb/README.md) implements native DataFlash
+streaming and disarmed archival to i.MX SD, without reusing the PX4 ULog protocol.
+Onboard logging stays the default; live streaming is explicit opt-in because an
+absent receiver can affect the logging/prearm check. Archived logs are read twice
+and verified; live streams have no EOF guarantee and are labeled accordingly.
+Bandwidth, SD power-loss behavior and physical persistence still require the
+documented bench tests. No successful hardware test is claimed by compilation.
