@@ -1,5 +1,9 @@
 # APB i.MX DataFlash logging
 
+**Start here:** [one-command setup and status](QUICKSTART.md). The common
+`easy.py` tool handles dependencies, installation and explicit bench activation.
+The detailed manual procedure below remains available.
+
 This package supplies **live ArduPilot DataFlash recording and verified
 post-flight archival** to the Linux-owned microSD. It does not use PX4 ULog,
 open the UART, change FC parameters, erase onboard flash, format a card or

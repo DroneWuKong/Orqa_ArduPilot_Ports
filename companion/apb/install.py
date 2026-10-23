@@ -20,7 +20,7 @@ def safe_path(path):
         raise ValueError("symlinked installation destination: " + str(path))
 
 
-def install(root, source, repair=False):
+def install(root, source, repair=False, dry_run=False):
     root, source = Path(root).absolute(), Path(source).resolve()
     safe_path(root)
     files = {}
@@ -29,6 +29,8 @@ def install(root, source, repair=False):
             files[path] = root / f"usr/local/lib/orqa-{FAMILY}" / path.name
         elif path.suffix == ".service":
             files[path] = root / "etc/systemd/system" / path.name
+        elif path.name == "profile.json":
+            files[path] = root / f"usr/local/lib/orqa-{FAMILY}" / path.name
         elif path.suffix == ".conf":
             files[path] = root / "etc/mavlink-router/config.d" / path.name
     helper = root / "etc/udev/scripts/orqa-drive-mounting.sh"
@@ -48,6 +50,8 @@ def install(root, source, repair=False):
         if dest.exists() and digest(dest) != digest(incoming):
             if not (repair and dest == helper and digest(dest) == VENDOR_HASH):
                 raise ValueError("preserve/review existing file: " + str(dest))
+    if dry_run:
+        return sorted(str(dest) for dest in files.values())
     if repair and not backup.exists():
         shutil.copy2(helper, backup)
     for incoming, dest in files.items():
