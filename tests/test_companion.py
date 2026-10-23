@@ -186,6 +186,7 @@ class StreamTests(StorageFixture):
             path = self.path / "ardupilot" / stream.capture.name
             self.assertEqual(path.read_bytes(), raw[:600])
             reader = DFReader.DFReader_binary(str(path))
+            self.addCleanup(reader.close)
             self.assertEqual(reader.recv_match(type="TEST").Value, 0.0)
 
 
