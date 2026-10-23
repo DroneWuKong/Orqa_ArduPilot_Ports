@@ -35,6 +35,11 @@ It does not overwrite existing releases. No automatic stable release exists.
 
 Artifacts expire after 30 days; a published release provides persistent download
 links and SHA256SUMS. Download the matching manifest and keep it with the firmware.
+Releases also include `companion-apb.tar.gz`, exported from the same checked
+commit, with installation/rollback instructions. Its checksum is in SHA256SUMS.
+CI runs companion protocol/storage tests alongside firmware checks. Changes to
+the companion's wire protocol or runtime dependencies require host fault tests
+and a fresh physical bench check; neither inherits qualification from firmware CI.
 Source reproduction requires the exact upstream commit/submodule pins in the
 lock plus this repository at the manifest's port revision. Port source and GPL
 license are included in tagged releases. Build tools are checksum-verified;

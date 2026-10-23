@@ -17,9 +17,10 @@ backup, power source and media model before testing.
   Verify settings survive a full power cycle.
 - Run output, sensor, storage and serial workloads concurrently. Record errors,
   dropouts and latency; a successful compile does not test DMA contention.
-- APB: confirm the i.MX UART link independently. The companion owns microSD.
-  Neither this repository nor the PX4 ULog service establishes compatible
-  companion logging for this firmware.
+- APB: follow [companion installation and acceptance](../companion/apb/README.md).
+  Verify actual i.MX UART transport, a parsed SD log and its receipt checksum.
+  Exercise missing/full/read-only media, reconnect and controlled power loss.
+  Host protocol tests do not establish physical persistence.
 - Retest after upstream updates, especially bootloader/layout, sensor and
   parameter changes. Only proceed to controlled flight after bench acceptance.
 
