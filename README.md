@@ -80,7 +80,7 @@ Exact compiler, source and targets: [upstream.lock.json](upstream.lock.json).
 ~~~sh
 python3 -m venv .venv
 . .venv/bin/activate
-pip install -r requirements-build.txt
+pip install -r requirements-build.txt -r companion/apb/requirements.txt
 python scripts/build.py toolchain work/tools
 export PATH="$PWD/work/tools/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH"
 python scripts/build.py prepare work/ardupilot
