@@ -103,6 +103,22 @@ class StorageTests(StorageFixture):
             with self.assertRaises(FileExistsError):
                 capture.finish("bin", {})
             self.assertEqual(final.read_bytes(), b"keep")
+            self.assertFalse(final.with_suffix(".bin.json").exists())
+
+    def test_receipt_publication_failure_keeps_unfinalized_metadata(self):
+        real_rename = storage.rename_new
+        def fail_receipt(directory, source, destination):
+            if destination.endswith(".json"):
+                raise OSError("receipt failure")
+            real_rename(directory, source, destination)
+        with self.store() as store, store.new("dataflash") as capture:
+            capture.append(b"data")
+            with patch.object(storage, "rename_new", side_effect=fail_receipt):
+                with self.assertRaises(OSError):
+                    capture.finish("bin", {"complete": True})
+            folder = self.path / "ardupilot"
+            self.assertFalse(list(folder.glob("*.json")))
+            self.assertTrue(list(folder.glob("*.json.partial")))
 
 
 class StreamTests(StorageFixture):

@@ -34,6 +34,11 @@ including the tail. W25 page padding may remain in archived DataFlash files.
 Even `complete: true` means a verified transfer, not loss-free FC logging or
 flight qualification. Inspect ArduPilot logger drop counters as well.
 
+A capture is finalized only when its matching JSON receipt exists and its
+SHA256 matches. The receipt is published last. A crash can leave a data file
+with only a `.json.partial` receipt; preserve it for inspection, not as a
+verified complete capture. This package is GPL-3.0-or-later; see COPYING.
+
 ## Install on a disarmed bench
 
 Download `companion-apb.tar.gz` and `SHA256SUMS` from this repository's tagged

@@ -50,6 +50,17 @@ def check_space(fd, reserve, upcoming=0):
         raise NotReady("SD space below reserve; existing logs will not be deleted")
 
 
+def rename_new(directory, source, destination):
+    # Linux renameat2(RENAME_NOREPLACE) supports FAT/exFAT without hard links.
+    libc = ctypes.CDLL(None, use_errno=True)
+    rename = libc.renameat2
+    rename.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+    rename.restype = ctypes.c_int
+    if rename(directory, os.fsencode(source), directory, os.fsencode(destination), 1):
+        error = ctypes.get_errno()
+        raise OSError(error, os.strerror(error))
+
+
 class Store:
     def __init__(self, mount, family, role, reserve=256*1024*1024):
         if family not in ("ardupilot", "betaflight") or role not in ("archive", "live") or reserve < 0:
@@ -139,7 +150,8 @@ class Capture:
         receipt = dict(metadata, bytes=self.size, sha256=sha, file=final,
                        hardware_validated=False, captured_unix_ns=time.time_ns())
         meta_name = final + ".json"
-        meta = os.open(meta_name, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+        meta_stage = meta_name + ".partial"
+        meta = os.open(meta_stage, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
                        0o640, dir_fd=self.store.fd)
         try:
             with os.fdopen(meta, "w") as out:
@@ -147,15 +159,11 @@ class Capture:
                 out.write("\n")
                 out.flush()
                 os.fsync(out.fileno())
-            # Linux renameat2(RENAME_NOREPLACE), also works on FAT/exFAT SDs
-            # which cannot hard-link. Never replace an existing capture.
-            libc = ctypes.CDLL(None, use_errno=True)
-            rename = libc.renameat2
-            rename.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
-            rename.restype = ctypes.c_int
-            if rename(self.store.fd, os.fsencode(self.name), self.store.fd, os.fsencode(final), 1):
-                error = ctypes.get_errno()
-                raise OSError(error, os.strerror(error))
+            # Publish the receipt LAST. A crash/failure must never publish a
+            # complete receipt for missing or unrelated bytes.
+            rename_new(self.store.fd, self.name, final)
+            os.fsync(self.store.fd)
+            rename_new(self.store.fd, meta_stage, meta_name)
             os.fsync(self.store.fd)
         finally:
             self.close()
