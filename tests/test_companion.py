@@ -246,6 +246,32 @@ class ArchiveTests(unittest.TestCase):
             archive.chunk(1,0,180)
 
 
+class ArchiveStorageTests(StorageFixture):
+    def test_unrelated_growing_log_does_not_block_closed_log(self):
+        from archive import Archive
+        raw = b"\xa3\x95\x80" + bytes(197)
+        entry = {"id":1,"size":len(raw),"time_utc":0}
+        with self.store() as store:
+            link = Mock(system=1)
+            archive = Archive(link,store)
+            archive.chunk = Mock(side_effect=lambda log_id,offset,count: raw[offset:offset+count])
+            archive.listing = Mock(return_value={1:entry,2:{"id":2,"size":999,"time_utc":5}})
+            receipt = archive.download(entry,{1:entry,2:{"id":2,"size":100,"time_utc":1}})
+            self.assertTrue(receipt["complete"])
+
+    def test_selected_growing_log_never_finalized(self):
+        from archive import Archive
+        raw = b"\xa3\x95\x80" + bytes(197)
+        entry = {"id":1,"size":len(raw),"time_utc":0}
+        with self.store() as store:
+            archive = Archive(Mock(system=1),store)
+            archive.chunk = Mock(side_effect=lambda log_id,offset,count: raw[offset:offset+count])
+            archive.listing = Mock(return_value={1:dict(entry,size=300)})
+            with self.assertRaisesRegex(ValueError,"selected log"):
+                archive.download(entry,{1:entry})
+            self.assertFalse(list((self.path/"ardupilot").glob("*.bin")))
+
+
 class LinkTests(unittest.TestCase):
     def link(self):
         from link import Link

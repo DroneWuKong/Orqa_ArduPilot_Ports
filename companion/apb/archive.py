@@ -105,11 +105,11 @@ class Archive:
                     verify.update(self.chunk(log_id, offset, min(900, size-offset)))
                 if verify.hexdigest() != capture.hash.hexdigest():
                     raise ValueError("onboard log changed during archive verification")
-                if self.listing() != inventory:
-                    raise ValueError("log inventory changed during archive")
+                if self.listing().get(log_id) != entry:
+                    raise ValueError("selected log inventory changed during archive")
                 return capture.finish("bin", {"kind": "archived-dataflash", "complete": True,
                     "source_system": self.link.system, "onboard_log": entry,
-                    "verification": "two full reads, matching SHA256 and stable inventory",
+                    "verification": "two full reads, matching SHA256 and stable selected-log inventory",
                     "scope": "complete advertised onboard byte range; does not prove producer had no drops"})
             finally:
                 self.end()
@@ -144,7 +144,7 @@ def main():
                     link.ready(disarmed=True)
                     if disarmed_since is None:
                         disarmed_since = time.monotonic()
-                    if pending and (not args.watch or time.monotonic()-disarmed_since >= 10):
+                    if pending and (not args.watch or time.monotonic()-disarmed_since >= 30):
                         inventory = archive.listing()
                         if args.log_id is not None and args.log_id not in inventory:
                             raise ValueError("requested log not found")

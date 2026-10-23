@@ -19,7 +19,7 @@ loopback endpoints: live recorder 14561, archive worker 14562. Files go to
   onboard logs. It checks every offset/length, retries missing bytes and requires
   two complete reads with equal SHA256 plus an unchanged inventory. It never
   sends LOG_ERASE. `--watch` archives at startup and after observed disarms,
-  following ten seconds continuously disarmed; it aborts if arming occurs.
+  following thirty seconds continuously disarmed; it aborts if arming occurs.
 - `storage.py`: checks a real read-write SD mount through mountinfo/sysfs,
   rejects eMMC/root/symlinks, pins the opened directory, reserves 256 MiB and
   stops on media removal, replacement or I/O failure. One writer per role.
@@ -85,6 +85,9 @@ factory bootloader layout and axes. Existing saved parameters override defaults.
   assume every high-rate log fits the 230400 link. Keep onboard logging enabled.
 - Use `LOG_DISARMED=0` for stable post-flight archives. Persistent logging while
   disarmed can change the newest log during verification; that transfer must fail.
+  ArduPilot can also keep logging after disarm or prearm failures. Older closed
+  logs remain recoverable with `--log-id N`; changes to another log do not
+  invalidate an otherwise verified selected-log transfer.
 - A missing live receiver can cause ArduPilot's logging/prearm check to fail
   when the MAVLink backend is enabled. Do not disable prearm checks to hide it:
   restore the receiver or explicitly return to block-only logging on the bench.
