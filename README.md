@@ -36,7 +36,7 @@ then verify physical axes. H7 upstream sensor assumptions remain unchanged.
   STM32 filesystem. The microSD remains Linux-owned.
 - Separate sensor-population variants; preserve the factory APB bootloader
   rather than embedding an unverified replacement.
-- Check source/compiler pins, APJ identity, decoded APJ/BIN agreement, vectors
+- Check source/compiler pins, APJ identity, APJ/BIN/ELF agreement, vectors
   and ELF load bounds; publish manifests and checksums.
 - Weekly stable-update PRs and manual-only prerelease publication.
 
