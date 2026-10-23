@@ -1,0 +1,78 @@
+{
+  "kind": "ardupilot",
+  "repository": "ArduPilot/ardupilot",
+  "tag": "Copter-4.7.2",
+  "revision": "fb773567896014da007bca58358704d4a0d8516f",
+  "toolchain": {
+    "version": "10.2.1",
+    "url": "https://firmware.ardupilot.org/Tools/STM32-tools/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2",
+    "sha256": "21134caa478bbf5352e239fbc6e2da3038f8d2207e089efc96c3b55f1edcd618",
+    "directory": "gcc-arm-none-eabi-10-2020-q4-major"
+  },
+  "targets": [
+    {
+      "id": "quadcore-copter",
+      "board": "OrqaH7QuadCore",
+      "vehicle": "copter",
+      "board_id": 1204,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "wingcore-plane",
+      "board": "OrqaH7QuadCore",
+      "vehicle": "plane",
+      "board_id": 1204,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "f405-copter",
+      "board": "OrqaF405Pro",
+      "vehicle": "copter",
+      "board_id": 1155,
+      "flash_start": 134266880,
+      "flash_end": 135266304
+    },
+    {
+      "id": "f405-plane",
+      "board": "OrqaF405Pro",
+      "vehicle": "plane",
+      "board_id": 1155,
+      "flash_start": 134266880,
+      "flash_end": 135266304
+    },
+    {
+      "id": "apb-copter",
+      "board": "OrqaAPB",
+      "vehicle": "copter",
+      "board_id": 1189,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "apb-plane",
+      "board": "OrqaAPB",
+      "vehicle": "plane",
+      "board_id": 1189,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "apb-icm42688-copter",
+      "board": "OrqaAPB-ICM42688",
+      "vehicle": "copter",
+      "board_id": 1189,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "apb-icm42688-plane",
+      "board": "OrqaAPB-ICM42688",
+      "vehicle": "plane",
+      "board_id": 1189,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+work/
+artifacts/
+graphify-out/
+.venv/

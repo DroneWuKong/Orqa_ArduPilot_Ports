@@ -1,0 +1,30 @@
+diff --git a/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/README.md b/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/README.md
+index 25caa9b..9e227cf 100644
+--- a/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/README.md
++++ b/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/README.md
+@@ -62,8 +62,8 @@ LiPo batteries.
+ The correct battery setting parameters are:
+ 
+ - BATT_MONITOR 4
+-- BATT_VOLT_PIN 13
+-- BATT_CURR_PIN 12
++- BATT_VOLT_PIN 11
++- BATT_CURR_PIN 13
+ - BATT_VOLT_MULT 8.3
+ - BATT_AMP_PERVLT 92.6
+ 
+diff --git a/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/hwdef.dat b/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/hwdef.dat
+index caaa3de..06009a0 100644
+--- a/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/hwdef.dat
++++ b/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/hwdef.dat
+@@ -135,9 +135,8 @@ BARO DPS310 I2C:0:0x77
+ 
+ # IMU setup
+ SPIDEV imu1   SPI1 DEVID1 GYRO1_CS   MODE3   1*MHZ   8*MHZ
+-SPIDEV imu2   SPI1 DEVID1 GYRO1_CS   MODE3   1*MHZ   8*MHZ
+ 
+ IMU Invensense SPI:imu1 ROTATION_YAW_90
+-IMU Invensensev3 SPI:imu2 ROTATION_PITCH_180
++IMU Invensensev3 SPI:imu1 ROTATION_PITCH_180
+ DMA_NOSHARE TIM2_UP TIM3_UP SPI1*
+ DMA_PRIORITY TIM2_UP TIM3_UP SPI1*

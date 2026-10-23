@@ -1,0 +1,5 @@
+# Later SPI4 ICM42688P population: select explicitly, verify physical axes.
+include ../OrqaAPB/hwdef.dat
+undef IMU
+IMU Invensensev3 SPI:imu1 ROTATION_PITCH_180
+IMU Invensensev3 SPI:imu2 ROTATION_ROLL_180_YAW_90
