@@ -54,7 +54,7 @@ the FC alone does not install Linux logging. Older tagged bundles without
 
 ## Downloads and flashing
 
-Persistent downloads: [v0.1.0-rc1 prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc1).
+Persistent downloads: [v0.1.0-rc2 prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc2).
 Choose the matching `.apj`; download `companion-apb.tar.gz` for the APB Linux
 logging package and `SHA256SUMS` for verification. These are bench-test builds,
 not hardware-qualified releases.
