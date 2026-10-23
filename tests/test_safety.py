@@ -59,7 +59,7 @@ class ImageTests(unittest.TestCase):
     target = {"flash_start": 0x08060000, "flash_end": 0x08200000}
 
     def data(self, stack=0x20010000, reset=0x08060101):
-        return struct.pack("<II", stack, reset) + bytes(248)
+        return struct.pack("<II", stack, reset) + bytes(504)
 
     def test_valid_vector(self):
         build.validate_image(self.data(), self.target)
@@ -72,9 +72,29 @@ class ImageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build.validate_image(self.data(reset=0x08060100), self.target)
 
+    def test_reset_into_unwritten_flash(self):
+        with self.assertRaises(ValueError):
+            build.validate_image(self.data(reset=0x08061001), self.target)
+
     def test_invalid_stack(self):
         with self.assertRaises(ValueError):
             build.validate_image(self.data(stack=0x08001000), self.target)
+
+    def test_ram_hole_rejected(self):
+        with self.assertRaises(ValueError):
+            build.validate_image(self.data(stack=0x21000000), self.target)
+
+    def test_f405_ccm_stack(self):
+        target = {"flash_start": 0x08000000, "flash_end": 0x08100000}
+        build.validate_image(self.data(stack=0x10010000, reset=0x08000101), target)
+
+    def test_ccm_not_valid_for_h743(self):
+        with self.assertRaises(ValueError):
+            build.validate_image(self.data(stack=0x10010000), self.target)
+
+    def test_stack_alignment(self):
+        with self.assertRaises(ValueError):
+            build.validate_image(self.data(stack=0x20010001), self.target)
 
     def test_empty_or_oversize(self):
         for raw in [b"", bytes(12), bytes(0x200000)]:
@@ -137,6 +157,73 @@ class BoardTests(unittest.TestCase):
             self.assertIn("+- BATT_VOLT_PIN 11", diff)
             self.assertIn("+- BATT_CURR_PIN 13", diff)
 
+
+
+class ReleaseTests(unittest.TestCase):
+    def setUp(self):
+        self.release = module("release")
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.folder = Path(self.tmp.name)
+        self.target = {"id": "board", "board": "BOARD"}
+        self.config = {"kind": "betaflight", "targets": [self.target]}
+        self.revision = "a" * 40
+        import hashlib
+        hashes = {}
+        for suffix in (".hex", ".bin", ".elf"):
+            name = "board" + suffix
+            (self.folder / name).write_bytes(b"test fixture")
+            hashes[name] = hashlib.sha256(b"test fixture").hexdigest()
+        self.manifest = {"target": self.target, "upstream": self.config,
+                         "port_revision": self.revision, "port_worktree_dirty": False,
+                         "hardware_validated": False, "artifacts": hashes}
+
+    def verify(self):
+        (self.folder / "board.manifest.json").write_text(json.dumps(self.manifest))
+        return self.release.verify(self.folder, self.config, self.revision)
+
+    def test_complete_artifacts(self):
+        self.assertEqual(len(self.verify()), 4)
+
+    def test_missing_target(self):
+        with self.assertRaises(ValueError):
+            self.release.verify(self.folder, self.config, self.revision)
+
+    def test_wrong_commit(self):
+        self.manifest["port_revision"] = "b" * 40
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_dirty_build(self):
+        self.manifest["port_worktree_dirty"] = True
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_false_qualification(self):
+        self.manifest["hardware_validated"] = True
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_wrong_upstream(self):
+        self.manifest["upstream"] = {}
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_tampered_binary(self):
+        (self.folder / "board.bin").write_bytes(b"tampered")
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_extra_payload(self):
+        self.manifest["artifacts"]["unexpected.sh"] = "f" * 64
+        with self.assertRaises(ValueError):
+            self.verify()
+
+    def test_symlink_payload(self):
+        (self.folder / "board.bin").unlink()
+        (self.folder / "board.bin").symlink_to(self.folder / "board.hex")
+        with self.assertRaises(ValueError):
+            self.verify()
 
 if __name__ == "__main__":
     unittest.main()

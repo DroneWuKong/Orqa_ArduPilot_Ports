@@ -106,7 +106,7 @@ def validate_image(data, target):
         ranges.extend([(0x24000000, 0x24080000), (0x30000000, 0x30048000)])
     if stack % 8 or not any(start < stack <= end for start, end in ranges):
         raise ValueError("Invalid initial stack pointer")
-    if not reset & 1 or not target["flash_start"] <= (reset & ~1) < target["flash_end"]:
+    if not reset & 1 or not target["flash_start"] <= (reset & ~1) < target["flash_start"] + len(data):
         raise ValueError("Invalid reset vector / wrong flash offset")
 
 
@@ -121,6 +121,8 @@ def check_elf(elf, target):
         end = max(s["p_paddr"] + s["p_filesz"] for s in segments)
         if end > target["flash_end"]:
             raise ValueError("ELF exceeds physical flash")
+        if target["flash_end"] - end < 16 * 1024:
+            raise ValueError("Less than 16 KiB physical flash headroom; review feature/flash budget")
         return {"flash_end_used": end, "physical_flash_free": target["flash_end"] - end}
 
 

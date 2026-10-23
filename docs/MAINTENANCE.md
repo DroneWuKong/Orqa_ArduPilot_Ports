@@ -19,6 +19,8 @@ notifications; schedules may be delayed or disabled by GitHub for inactive repos
    timer/DMA, bootloader and parameter behavior.
 3. Require the complete **All firmware checks** status on the current PR commit.
 4. Review every target manifest and any change in flash usage.
+   Artifact checks require at least 16 KiB of physical flash headroom; linker
+   scripts separately enforce reserved parameter/config regions.
 5. Re-run the relevant physical bench checks; do not inherit qualification
    merely because the previous release passed.
 6. Merge only after human review. The main push produces a fresh build.
