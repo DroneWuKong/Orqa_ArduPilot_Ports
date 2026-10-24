@@ -49,8 +49,9 @@ Details: [audit/provenance](docs/AUDIT.md), [bench checks](docs/TESTING.md),
 
 See the [APB quick start](companion/apb/QUICKSTART.md): one setup command, then
 `status` and `logs`. Use the matching companion package on the i.MX; flashing
-the FC alone does not install Linux logging. Older tagged bundles without
-`easy.py` require the current source/CI package.
+the FC alone does not install Linux logging. Select firmware and companion from
+the same verified release/source revision. See the [release audit](docs/APB_RELEASE_AUDIT_2026-10-24.md)
+and [disarmed logging checklist](companion/apb/BENCH_ACCEPTANCE.md).
 
 ## Downloads and flashing
 
