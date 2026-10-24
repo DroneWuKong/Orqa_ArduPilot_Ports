@@ -127,6 +127,9 @@ Run `python -m unittest discover -s tests -v` from the repository after installi
 these requirements. Tests include actual pymavlink wire encoding/DataFlash
 decoding and fault injection; they are **host tests**, not device evidence.
 
+For a fully disarmed logging-only run, follow [BENCH_ACCEPTANCE.md](BENCH_ACCEPTANCE.md).
+The wider qualification below includes separate arming work.
+
 On the actual APB, props off: test each IMU axis, log start/disarm/re-arm, extract
 and parse a full archive, verify receipt SHA256, and compare with a GCS download.
 Then exercise no-card boot, low space, read-only media, disconnect/reconnect,
@@ -140,10 +143,11 @@ missing heartbeats, wrong backend/IDs, another receiver, actual SD mount and
 media errors in that order. Never force a rootfs fallback. Never equate an ACK
 with a guarantee against all SD-controller power-loss behavior.
 
-Rollback: disable/stop the two `orqa-ardupilot-*` units, move only
+Rollback: first restore the saved block-only `LOG_BACKEND_TYPE` on the bench
+and reboot if leaving live logging, so removal of the receiver does not leave a
+live-backend dependency. Then disable/stop the two `orqa-ardupilot-*` units, move only
 `91-orqa-ardupilot-logging.conf` out of the router's loaded config directory,
-then restart the router once on the bench. Return `LOG_BACKEND_TYPE` to its saved
-value as appropriate. Keep captured logs. The common SD repair can remain;
+then restart the router once on the bench. Keep captured logs. The common SD repair can remain;
 to undo it, restore only the verified `.pre-orqa-logging` helper backup while
 disarmed. Do not remove a shared mount helper still used by another package.
 

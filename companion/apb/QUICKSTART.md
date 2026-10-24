@@ -3,6 +3,8 @@
 Use the companion package for the firmware you actually flashed: PX4,
 ArduPilot or Betaflight. Each bundle identifies its own profile; no guessing or
 automatic firmware switching. The same commands work in all three packages.
+Use the [disarmed logging acceptance checklist](BENCH_ACCEPTANCE.md) to record
+physical results separately from host tests.
 The i.MX writes the SD card.
 
 **These commands run on the APB Linux companion, not your PC or flight controller.**
@@ -34,9 +36,15 @@ the bench; an absent ArduPilot live receiver can affect the logging/prearm check
 ## 2. Install and start
 
 Verify the downloaded package checksum, extract it, and open the directory
-containing `easy.py`. **Older releases without easy.py do not have this helper**;
-use a new CI companion bundle or this repository's current `companion/apb`
-directory in full. Do not mix individual files from different revisions.
+containing `easy.py`. Use a firmware/companion pair from one verified release:
+PX4 rc3, ArduPilot rc2,
+or Betaflight rc3 (all v0.1.0 prereleases). See this repository's
+[release audit and exact file selection](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/blob/main/docs/APB_RELEASE_AUDIT_2026-10-24.md)
+on GitHub if using an extracted archive. The archive does not contain the full
+repository. **Older bundles without easy.py do not have this helper**; do not
+combine their firmware with a moving main/master or unrelated CI package.
+For a newer build, verify both firmware and companion against that exact source
+revision. Do not mix individual files from different revisions.
 
 ~~~sh
 sudo python3 easy.py setup --activate --bench
@@ -76,6 +84,10 @@ Status reports runtime dependencies, UART presence, actual SD mount/free space,
 conflicting services, and recorder service state. Add `--live` when checking
 the optional ArduPilot live recorder, or `--json` for machine-readable output.
 Any failed required check returns a nonzero exit code with an explanation.
+The UART check proves only that `/dev/ttymxc2` is a character device. Independently
+verify actual UART ownership, baud/protocol, router config-directory loading,
+free UDP ports and source identity. Known service checks cannot find every
+manually started serial program or competing GCS log client.
 `logs --follow` follows the recorder journals.
 
 An active service is **not proof of a received/complete log**. Read the journal,
@@ -92,11 +104,16 @@ sudo python3 easy.py stop --bench
 sudo python3 easy.py rollback --bench
 ~~~
 
-Stop disables only this profile's recorder units. Rollback additionally moves
+Stop disables only this profile's recorder units. For PX4/ArduPilot, rollback
+additionally moves
 its unchanged router endpoint to `/var/lib/orqa-logging/rollback` and restarts
 the core router if it was active. Customized endpoints are refused.
 Both preserve logs, dependencies, runtime files and the shared SD repair.
-This is companion deactivation, not firmware/FC-parameter rollback.
+Betaflight has no router endpoint to remove and does not re-enable MAVLink.
+This is companion deactivation, not firmware/FC-parameter rollback. For an
+ArduPilot live-to-archive change, restore block-only FC logging and reboot on the
+bench, then stop both units and start without `--live`; omitting `--live` alone
+does not disable a previously enabled live unit.
 To reactivate after rollback, run setup again.
 
 If any command fails, inspect its error and run status/logs. A partly completed
