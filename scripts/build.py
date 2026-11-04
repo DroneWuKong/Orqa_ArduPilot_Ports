@@ -30,6 +30,22 @@ def lock():
     return json.loads((ROOT / "upstream.lock.json").read_text())
 
 
+def verify_sensor_population(population, target, config):
+    """Guard an explicitly identified APB population without changing defaults."""
+    path = ROOT / "qualification/apb-sensor-populations.json"
+    records = json.loads(path.read_text())["populations"]
+    if population not in records:
+        raise ValueError("Unknown sensor population; identify it before selecting firmware")
+    record = records[population]
+    if not record["build_targets"]:
+        raise ValueError("No ArduPilot target qualified for build selection for this population; see docs/APB-DUAL-ICM42605.md")
+    if (target not in record["build_targets"]
+            or target not in {item["id"] for item in config["targets"]}):
+        raise ValueError("Target does not match the declared sensor population")
+    return {"population": population, "target": target,
+            "hardware_qualified": record["hardware_qualified"]}
+
+
 def verify_revision(source, config):
     if run("git", "rev-parse", "HEAD", cwd=source, capture=True).strip() != config["revision"]:
         raise ValueError("Source revision mismatch; use a fresh source directory")
@@ -200,7 +216,7 @@ def collect(source, target, config, out):
         shutil.copy2(original, dest)
         hashes[dest.name] = digest(dest)
     inputs = {}
-    for folder in ("boards", "configs", "patches", "scripts", "companion"):
+    for folder in ("boards", "configs", "patches", "scripts", "companion", "qualification"):
         for path in sorted((ROOT / folder).rglob("*")):
             if path.is_file() and "__pycache__" not in path.parts:
                 inputs[str(path.relative_to(ROOT))] = digest(path)
@@ -244,6 +260,7 @@ def main():
     parser.add_argument("action", choices=["prepare", "toolchain", "build", "collect"])
     parser.add_argument("directory", type=Path)
     parser.add_argument("--target")
+    parser.add_argument("--sensor-population", help="Explicit APB population compatibility guard")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts")
     parser.add_argument("--jobs", type=int, default=2)
     args = parser.parse_args()
@@ -252,6 +269,10 @@ def main():
     target = next((t for t in config["targets"] if t["id"] == args.target), None)
     if args.action in ("build", "collect") and target is None:
         parser.error("Select a target from upstream.lock.json")
+    if args.sensor_population:
+        if args.action not in ("build", "collect"):
+            parser.error("--sensor-population applies to build/collect")
+        verify_sensor_population(args.sensor_population, args.target, config)
     if args.action == "prepare":
         prepare(directory, config)
     elif args.action == "toolchain":

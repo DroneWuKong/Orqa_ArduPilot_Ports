@@ -24,6 +24,20 @@ APB's default population is MPU6000 + ICM42605; the later variant is dual
 ICM42688P with its different SPI4 rotation. Select from actual chip markings,
 then verify physical axes. H7 upstream sensor assumptions remain unchanged.
 
+## Dual-ICM42605 APB population
+
+A reference APB has **two ICM42605 sensors**, a third population distinct from
+the two APB variants above. The base hwdef can probe these chips, but probing
+does not establish the correct driver/body-axis transforms. There is currently
+no reviewed release target for this population. Do not substitute a mixed-IMU
+or dual-ICM42688 image merely because the MCU or board ID matches.
+
+See [the qualification record](qualification/apb-sensor-populations.json) and
+[required axis/output checks](docs/APB-DUAL-ICM42605.md). Build/collect commands
+accept `--sensor-population`; explicitly declaring `apb-dual-icm42605` rejects
+existing targets until the separate ArduPilot qualification is completed.
+Existing board definitions and release artifacts are unchanged.
+
 ## Fixes and improvements
 
 - Consolidate F405's two aliases for one physical SPI1 IMU into one device,

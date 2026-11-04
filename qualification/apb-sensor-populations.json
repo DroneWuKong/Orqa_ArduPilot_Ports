@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "populations": {
+    "apb-mpu6000-icm42605": {
+      "build_targets": [
+        "apb-copter",
+        "apb-plane"
+      ],
+      "hardware_qualified": false
+    },
+    "apb-dual-icm42688": {
+      "build_targets": [
+        "apb-icm42688-copter",
+        "apb-icm42688-plane"
+      ],
+      "hardware_qualified": false
+    },
+    "apb-dual-icm42605": {
+      "build_targets": [],
+      "hardware_qualified": false,
+      "status": "blocked_pending_ardupilot_specific_axis_and_output_validation",
+      "observed_sensors": [
+        "SPI1 ICM42605",
+        "SPI4 ICM42605"
+      ],
+      "evidence_scope": "Sensor identity and chip-to-board rotations read on a Betaflight reference unit, not ArduPilot validation.",
+      "betaflight_reference": {
+        "repository": "DroneWuKong/Orqa_Betaflight_Ports",
+        "commit": "e10f8f2678faf792bd8bb2e54aed84da76c89c7d",
+        "alignments": [
+          "CW0_DEG_FLIP",
+          "CW270_DEG_FLIP"
+        ]
+      },
+      "current_base_hwdef_rotations": [
+        "ROTATION_PITCH_180",
+        "ROTATION_PITCH_180"
+      ],
+      "ardupilot_candidate_rotations": null,
+      "required_evidence": {
+        "driver_axis_transform_derivation": false,
+        "individual_sensor_body_axis_sweep": false,
+        "combined_imu_stationary_consistency": false,
+        "ardupilot_motor_order_and_direction": false,
+        "unit_bootloader_and_recovery_verification": false,
+        "manual_hover_and_log_review": false
+      },
+      "note": "Do not infer applicability from matching MCU, a successful probe, a shared board ID, or Betaflight qualification."
+    }
+  }
+}
