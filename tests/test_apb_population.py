@@ -1,6 +1,8 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,8 +16,14 @@ class PopulationTests(unittest.TestCase):
         result = build.verify_sensor_population("apb-mpu6000-icm42605", "apb-copter", build.lock())
         self.assertFalse(result["hardware_qualified"])
 
-    def test_dual_42605_cannot_alias_existing_targets(self):
+    def test_dual_42605_selects_only_separate_bench_target(self):
+        config = build.lock()
+        selected = build.verify_sensor_population(
+            "apb-dual-icm42605", "apb-dual-icm42605-copter", config)
+        self.assertFalse(selected["hardware_qualified"])
         for target in build.lock()["targets"]:
+            if target["id"] == "apb-dual-icm42605-copter":
+                continue
             with self.subTest(target=target["id"]), self.assertRaises(ValueError):
                 build.verify_sensor_population("apb-dual-icm42605", target["id"], build.lock())
 
@@ -23,13 +31,38 @@ class PopulationTests(unittest.TestCase):
         for population,target in [("apb-dual-icm42688","apb-copter"),("guess","apb-copter")]:
             with self.assertRaises(ValueError):build.verify_sensor_population(population,target,build.lock())
 
-    def test_gate_cannot_silently_publish_an_unreviewed_dual_target(self):
+    def test_dual_candidate_has_explicit_rotations_and_release_gate(self):
         records=json.loads((ROOT/"qualification/apb-sensor-populations.json").read_text())["populations"]
         dual=records["apb-dual-icm42605"]
-        self.assertEqual(dual["build_targets"],[])
-        self.assertIsNone(dual["ardupilot_candidate_rotations"])
-        self.assertFalse(any(dual["required_evidence"].values()))
-        self.assertFalse(any("dual-icm42605" in target["id"] for target in build.lock()["targets"]))
+        target=next(t for t in build.lock()["targets"] if t["id"] == "apb-dual-icm42605-copter")
+        hwdef=(ROOT/"boards"/target["board"]/"hwdef.dat").read_text()
+        self.assertEqual(dual["build_targets"],[target["id"]])
+        self.assertEqual(dual["ardupilot_candidate_rotations"],
+                         ["ROTATION_YAW_180", "ROTATION_YAW_90"])
+        self.assertEqual(target["sensor_population"],"apb-dual-icm42605")
+        self.assertFalse(target["release_eligible"])
+        self.assertFalse(dual["hardware_qualified"])
+        self.assertFalse(dual["required_evidence"]["individual_sensor_body_axis_sweep"])
+        self.assertIn("undef IMU",hwdef)
+        self.assertIn("IMU Invensensev3 SPI:imu1 ROTATION_YAW_180",hwdef)
+        self.assertIn("IMU Invensensev3 SPI:imu2 ROTATION_YAW_90",hwdef)
+
+    def test_apb_cli_requires_declared_population_before_build(self):
+        result=subprocess.run([sys.executable,str(ROOT/"scripts/build.py"),"build",
+                               "/nonexistent/ardupilot","--target","apb-copter"],
+                              text=True,capture_output=True)
+        self.assertEqual(result.returncode,2)
+        self.assertIn("require --sensor-population",result.stderr)
+
+    def test_all_apb_targets_have_one_population_record(self):
+        records=json.loads((ROOT/"qualification/apb-sensor-populations.json").read_text())["populations"]
+        for target in build.lock()["targets"]:
+            if not target["id"].startswith("apb-"):
+                continue
+            with self.subTest(target=target["id"]):
+                matching=[name for name, record in records.items()
+                          if target["id"] in record["build_targets"]]
+                self.assertEqual(matching,[target["sensor_population"]])
 
 
 if __name__ == "__main__":unittest.main()

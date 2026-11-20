@@ -256,6 +256,13 @@ class ReleaseTests(unittest.TestCase):
     def test_complete_artifacts(self):
         self.assertEqual(len(self.verify()), 4)
 
+    def test_bench_only_target_is_checked_but_not_published(self):
+        self.target["release_eligible"] = False
+        self.assertEqual(self.verify(), [])
+        (self.folder / "board.bin").write_bytes(b"tampered")
+        with self.assertRaises(ValueError):
+            self.release.verify(self.folder, self.config, self.revision)
+
     def test_missing_target(self):
         with self.assertRaises(ValueError):
             self.release.verify(self.folder, self.config, self.revision)

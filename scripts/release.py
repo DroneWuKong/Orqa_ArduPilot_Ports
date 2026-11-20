@@ -33,6 +33,8 @@ def verify(folder, config, revision):
             raise ValueError("Dirty, mismatched or incorrectly qualified build")
         if data["upstream"] != config:
             raise ValueError("Upstream pin mismatch")
+        if data.get("sensor_population") != expected[target].get("sensor_population"):
+            raise ValueError("Sensor population missing or mismatched")
         suffixes = {".bin", ".elf", ".hex" if config["kind"] == "betaflight" else ".apj"}
         if set(data["artifacts"]) != {target + suffix for suffix in suffixes}:
             raise ValueError("Unexpected firmware filenames")
@@ -40,8 +42,10 @@ def verify(folder, config, revision):
             artifact = path.parent / name
             if artifact.is_symlink() or hashlib.sha256(artifact.read_bytes()).hexdigest() != sha:
                 raise ValueError("Artifact checksum mismatch")
-            assets.append(artifact)
-        assets.append(path)
+            if expected[target].get("release_eligible", True):
+                assets.append(artifact)
+        if expected[target].get("release_eligible", True):
+            assets.append(path)
     return assets
 
 

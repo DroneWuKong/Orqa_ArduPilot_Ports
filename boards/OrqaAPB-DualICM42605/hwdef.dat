@@ -1,0 +1,7 @@
+# MRM2-10 dual-ICM42605 bench candidate; not a flight-qualified target.
+# Rotations match the retained 4.8-associated board definition. Both IMUs
+# require independent physical axis checks before this 4.7.2 build is flown.
+include ../OrqaAPB/hwdef.dat
+undef IMU
+IMU Invensensev3 SPI:imu1 ROTATION_YAW_180
+IMU Invensensev3 SPI:imu2 ROTATION_YAW_90

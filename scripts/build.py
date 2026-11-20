@@ -42,6 +42,9 @@ def verify_sensor_population(population, target, config):
     if (target not in record["build_targets"]
             or target not in {item["id"] for item in config["targets"]}):
         raise ValueError("Target does not match the declared sensor population")
+    selected = next(item for item in config["targets"] if item["id"] == target)
+    if selected.get("sensor_population") != population:
+        raise ValueError("Target lock and population record disagree")
     return {"population": population, "target": target,
             "hardware_qualified": record["hardware_qualified"]}
 
@@ -223,6 +226,7 @@ def collect(source, target, config, out):
     inputs["upstream.lock.json"] = digest(ROOT / "upstream.lock.json")
     manifest = {
         "target": target, "upstream": config, "inputs": inputs, "artifacts": hashes,
+        "sensor_population": target.get("sensor_population"),
         "port_revision": run("git", "rev-parse", "HEAD", cwd=ROOT, capture=True).strip(),
         "port_worktree_dirty": bool(run("git", "status", "--porcelain", cwd=ROOT, capture=True).strip()),
         "source_diff_sha256": hashlib.sha256(run("git", "diff", "HEAD", cwd=source, capture=True).encode()).hexdigest(),
@@ -269,10 +273,16 @@ def main():
     target = next((t for t in config["targets"] if t["id"] == args.target), None)
     if args.action in ("build", "collect") and target is None:
         parser.error("Select a target from upstream.lock.json")
-    if args.sensor_population:
-        if args.action not in ("build", "collect"):
-            parser.error("--sensor-population applies to build/collect")
-        verify_sensor_population(args.sensor_population, args.target, config)
+    if args.action in ("build", "collect"):
+        expected_population = target.get("sensor_population")
+        if expected_population:
+            if not args.sensor_population:
+                parser.error("APB builds require --sensor-population; identify the actual IMUs first")
+            verify_sensor_population(args.sensor_population, args.target, config)
+        elif args.sensor_population is not None:
+            parser.error("--sensor-population applies only to APB targets")
+    elif args.sensor_population is not None:
+        parser.error("--sensor-population applies to build/collect")
     if args.action == "prepare":
         prepare(directory, config)
     elif args.action == "toolchain":
