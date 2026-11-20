@@ -18,7 +18,7 @@ This repository does not change flight-control algorithms or certify hardware.
 | f405-plane | OrqaF405Pro | Plane | 1155 |
 | apb-copter / apb-plane | OrqaAPB | Copter / Plane | 1189 |
 | apb-icm42688-copter / apb-icm42688-plane | OrqaAPB-ICM42688 | Copter / Plane | 1189 |
-| apb-dual-icm42605-copter | OrqaAPB-DualICM42605 | Copter bench candidate | 1189 |
+| apb-dual-icm42605-copter | OrqaAPB-DualICM42605 | Copter | 1189 |
 
 Wingcore uses the shared H7 hardware target with Plane, not a new board ID.
 APB's default population is MPU6000 + ICM42605; the later variant is dual
@@ -30,16 +30,17 @@ then verify physical axes. H7 upstream sensor assumptions remain unchanged.
 A flying MRM2-10 running a separate 4.8.0-dev build reports **two ICM42605
 sensors**, a third population distinct from the original APB variants. The
 4.7.2 `apb-dual-icm42605-copter` target copies candidate rotations from the
-retained 4.8-associated board definition. It is a **bench candidate**, not a
-flight-accepted 4.7.2 build. The exact 4.8 binary is different; flight of that
+retained 4.8-associated board definition. It follows the same experimental
+release policy as other targets; it has not been flight-tested. The exact 4.8
+binary is different; flight of that
 binary does not validate this one. Do not substitute a mixed-IMU or dual-ICM42688
 image merely because the MCU or board ID matches.
 
 See [the qualification record](qualification/apb-sensor-populations.json) and
 [required axis/output checks](docs/APB-DUAL-ICM42605.md). APB build/collect
 commands require `--sensor-population` so a builder must state the observed
-chip population. The dual-ICM42605 candidate is built in CI but is excluded
-from tagged prerelease firmware bundles while bench validation is open.
+chip population. The dual-ICM42605 candidate is built in CI and included in
+tagged prerelease firmware bundles under the same hardware-unvalidated label.
 Existing APB variants remain available for their declared populations.
 
 ## Fixes and improvements

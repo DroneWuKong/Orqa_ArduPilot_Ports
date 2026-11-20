@@ -83,7 +83,6 @@
       "board": "OrqaAPB-DualICM42605",
       "vehicle": "copter",
       "sensor_population": "apb-dual-icm42605",
-      "release_eligible": false,
       "board_id": 1189,
       "flash_start": 134610944,
       "flash_end": 136314880

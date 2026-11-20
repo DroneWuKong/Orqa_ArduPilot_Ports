@@ -32,7 +32,7 @@ motor mapping are not ArduPilot evidence.
 
 ## Build selection
 
-`apb-dual-icm42605-copter` is a separate **4.7.2 bench candidate**. The board
+`apb-dual-icm42605-copter` is a separate **4.7.2 experimental candidate**. The board
 overlay changes only the two IMU probe rotations; it inherits the generic APB
 pins, board ID 1189, and 384 KiB application offset. The old `apb-copter`
 target remains the mixed MPU6000/ICM42605 population; `apb-icm42688-copter`
@@ -47,8 +47,9 @@ python scripts/build.py collect work/ardupilot --target apb-dual-icm42605-copter
 ```
 
 The candidate is in CI so its APJ, ELF and BIN can be checked at the pinned
-source and toolchain. `release_eligible: false` excludes its artifacts from
-tagged prereleases. CI does not establish axis, output or flight behavior.
+source and toolchain. It is included in tagged prereleases under the same
+hardware-unvalidated policy as other targets. CI does not establish axis,
+output or flight behavior.
 Do not use the existing v0.1.0-rc2 `apb-copter.apj` on this population.
 
 ## Remaining checks before a 4.7.2 flight

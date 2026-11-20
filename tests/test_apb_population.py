@@ -31,7 +31,7 @@ class PopulationTests(unittest.TestCase):
         for population,target in [("apb-dual-icm42688","apb-copter"),("guess","apb-copter")]:
             with self.assertRaises(ValueError):build.verify_sensor_population(population,target,build.lock())
 
-    def test_dual_candidate_has_explicit_rotations_and_release_gate(self):
+    def test_dual_candidate_has_explicit_rotations_and_same_release_policy(self):
         records=json.loads((ROOT/"qualification/apb-sensor-populations.json").read_text())["populations"]
         dual=records["apb-dual-icm42605"]
         target=next(t for t in build.lock()["targets"] if t["id"] == "apb-dual-icm42605-copter")
@@ -40,7 +40,7 @@ class PopulationTests(unittest.TestCase):
         self.assertEqual(dual["ardupilot_candidate_rotations"],
                          ["ROTATION_YAW_180", "ROTATION_YAW_90"])
         self.assertEqual(target["sensor_population"],"apb-dual-icm42605")
-        self.assertFalse(target["release_eligible"])
+        self.assertNotIn("release_eligible",target)
         self.assertFalse(dual["hardware_qualified"])
         self.assertFalse(dual["required_evidence"]["individual_sensor_body_axis_sweep"])
         self.assertIn("undef IMU",hwdef)

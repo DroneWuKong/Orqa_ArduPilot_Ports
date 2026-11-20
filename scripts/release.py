@@ -42,10 +42,8 @@ def verify(folder, config, revision):
             artifact = path.parent / name
             if artifact.is_symlink() or hashlib.sha256(artifact.read_bytes()).hexdigest() != sha:
                 raise ValueError("Artifact checksum mismatch")
-            if expected[target].get("release_eligible", True):
-                assets.append(artifact)
-        if expected[target].get("release_eligible", True):
-            assets.append(path)
+            assets.append(artifact)
+        assets.append(path)
     return assets
 
 
