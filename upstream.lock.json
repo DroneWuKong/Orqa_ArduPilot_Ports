@@ -46,6 +46,7 @@
       "id": "apb-copter",
       "board": "OrqaAPB",
       "vehicle": "copter",
+      "sensor_population": "apb-mpu6000-icm42605",
       "board_id": 1189,
       "flash_start": 134610944,
       "flash_end": 136314880
@@ -54,6 +55,7 @@
       "id": "apb-plane",
       "board": "OrqaAPB",
       "vehicle": "plane",
+      "sensor_population": "apb-mpu6000-icm42605",
       "board_id": 1189,
       "flash_start": 134610944,
       "flash_end": 136314880
@@ -62,6 +64,7 @@
       "id": "apb-icm42688-copter",
       "board": "OrqaAPB-ICM42688",
       "vehicle": "copter",
+      "sensor_population": "apb-dual-icm42688",
       "board_id": 1189,
       "flash_start": 134610944,
       "flash_end": 136314880
@@ -70,6 +73,16 @@
       "id": "apb-icm42688-plane",
       "board": "OrqaAPB-ICM42688",
       "vehicle": "plane",
+      "sensor_population": "apb-dual-icm42688",
+      "board_id": 1189,
+      "flash_start": 134610944,
+      "flash_end": 136314880
+    },
+    {
+      "id": "apb-dual-icm42605-copter",
+      "board": "OrqaAPB-DualICM42605",
+      "vehicle": "copter",
+      "sensor_population": "apb-dual-icm42605",
       "board_id": 1189,
       "flash_start": 134610944,
       "flash_end": 136314880

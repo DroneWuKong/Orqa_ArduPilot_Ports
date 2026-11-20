@@ -38,6 +38,17 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Select declared hardware population
+        env:
+          TARGET_ID: ${{ matrix.target }}
+        run: |
+          python - <<'PY'
+          import json, os
+          config = json.load(open("upstream.lock.json"))
+          target = next(t for t in config["targets"] if t["id"] == os.environ["TARGET_ID"])
+          with open(os.environ["GITHUB_ENV"], "a") as out:
+              out.write("SENSOR_POPULATION=" + target.get("sensor_population", "") + "\n")
+          PY
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.11"
@@ -51,11 +62,21 @@ jobs:
       - name: Build
         env:
           TARGET_ID: ${{ matrix.target }}
-        run: python scripts/build.py build "$RUNNER_TEMP/source" --target "$TARGET_ID" --jobs 2
+        run: |
+          if [ -n "$SENSOR_POPULATION" ]; then
+            python scripts/build.py build "$RUNNER_TEMP/source" --target "$TARGET_ID" --sensor-population "$SENSOR_POPULATION" --jobs 2
+          else
+            python scripts/build.py build "$RUNNER_TEMP/source" --target "$TARGET_ID" --jobs 2
+          fi
       - name: Verify artifacts and write provenance
         env:
           TARGET_ID: ${{ matrix.target }}
-        run: python scripts/build.py collect "$RUNNER_TEMP/source" --target "$TARGET_ID"
+        run: |
+          if [ -n "$SENSOR_POPULATION" ]; then
+            python scripts/build.py collect "$RUNNER_TEMP/source" --target "$TARGET_ID" --sensor-population "$SENSOR_POPULATION"
+          else
+            python scripts/build.py collect "$RUNNER_TEMP/source" --target "$TARGET_ID"
+          fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: firmware-${{ matrix.target }}

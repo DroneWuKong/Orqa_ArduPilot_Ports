@@ -33,6 +33,8 @@ def verify(folder, config, revision):
             raise ValueError("Dirty, mismatched or incorrectly qualified build")
         if data["upstream"] != config:
             raise ValueError("Upstream pin mismatch")
+        if data.get("sensor_population") != expected[target].get("sensor_population"):
+            raise ValueError("Sensor population missing or mismatched")
         suffixes = {".bin", ".elf", ".hex" if config["kind"] == "betaflight" else ".apj"}
         if set(data["artifacts"]) != {target + suffix for suffix in suffixes}:
             raise ValueError("Unexpected firmware filenames")
