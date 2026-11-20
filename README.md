@@ -31,10 +31,9 @@ A flying MRM2-10 running a separate 4.8.0-dev build reports **two ICM42605
 sensors**, a third population distinct from the original APB variants. The
 4.7.2 `apb-dual-icm42605-copter` target copies candidate rotations from the
 retained 4.8-associated board definition. It follows the same experimental
-release policy as other targets; it has not been flight-tested. The exact 4.8
-binary is different; flight of that
-binary does not validate this one. Do not substitute a mixed-IMU or dual-ICM42688
-image merely because the MCU or board ID matches.
+release policy as other targets; it has not been flight-tested. Flight of the
+different 4.8 image does not validate this one. Do not substitute a mixed-IMU
+or dual-ICM42688 image merely because the MCU or board ID matches.
 
 See [the qualification record](qualification/apb-sensor-populations.json) and
 [required axis/output checks](docs/APB-DUAL-ICM42605.md). APB build/collect
@@ -42,6 +41,11 @@ commands require `--sensor-population` so a builder must state the observed
 chip population. The dual-ICM42605 candidate is built in CI and included in
 tagged prerelease firmware bundles under the same hardware-unvalidated label.
 Existing APB variants remain available for their declared populations.
+
+The [MRM2-10 AI compatibility status](docs/MRM2-10.md) distinguishes the 4.7.2
+source builds from the [exact installed 4.8.0-dev readback prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/mrm2-10-4.8.0-dev-0922bced-readback).
+The owner reports repeated flights with that 4.8 image. Its airframe settings
+and tune remain in a restricted Orqa review package.
 
 ## Fixes and improvements
 
@@ -73,7 +77,7 @@ the FC alone does not install Linux logging. Older tagged bundles without
 
 ## Downloads and flashing
 
-Persistent downloads: [v0.1.0-rc2 prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc2).
+Persistent downloads: [v0.1.0-rc3 prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc3).
 Choose the matching `.apj`; download `companion-apb.tar.gz` for the APB Linux
 logging package and `SHA256SUMS` for verification. These are bench-test builds,
 not hardware-qualified releases.
