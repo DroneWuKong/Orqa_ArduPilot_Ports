@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "populations": {
+    "apb-mpu6000-icm42605": {
+      "build_targets": [
+        "apb-copter",
+        "apb-plane"
+      ],
+      "hardware_qualified": false
+    },
+    "apb-dual-icm42688": {
+      "build_targets": [
+        "apb-icm42688-copter",
+        "apb-icm42688-plane"
+      ],
+      "hardware_qualified": false
+    },
+    "apb-dual-icm42605": {
+      "build_targets": [
+        "apb-dual-icm42605-copter"
+      ],
+      "hardware_qualified": false,
+      "status": "experimental_candidate_pending_ardupilot_specific_axis_and_output_validation",
+      "observed_sensors": [
+        "SPI1 ICM42605",
+        "SPI4 ICM42605"
+      ],
+      "evidence_scope": "Dual ICM42605 IDs read from the MRM2-10 ArduPilot FC on 2026-11-20. Candidate rotations copied from the retained 4.8-associated board definition; the original 4.8 build inputs are not proven complete. A separate Betaflight reference unit has the same chip population but does not validate ArduPilot axes.",
+      "mrm2_10_ardupilot_observation": {
+        "firmware": "4.8.0-dev 0922bced",
+        "imu1_device_id": 3473674,
+        "imu2_device_id": 3473698,
+        "observed_date": "2026-11-20"
+      },
+      "betaflight_reference": {
+        "repository": "DroneWuKong/Orqa_Betaflight_Ports",
+        "commit": "e10f8f2678faf792bd8bb2e54aed84da76c89c7d",
+        "alignments": [
+          "CW0_DEG_FLIP",
+          "CW270_DEG_FLIP"
+        ]
+      },
+      "current_base_hwdef_rotations": [
+        "ROTATION_PITCH_180",
+        "ROTATION_PITCH_180"
+      ],
+      "ardupilot_candidate_rotations": [
+        "ROTATION_YAW_180",
+        "ROTATION_YAW_90"
+      ],
+      "candidate_source": "Retained 2026-10-26 MRM2-10 4.8-associated installed-hwdef.dat SHA256 548e31466e2209b9476959f93e9e0102090115104a348c517add0754389f9fbc. The 4.7.2 and 4.8.0-dev ICM42605 raw FIFO-to-rotation path has the same axis operations; this does not prove the exact installed binary was compiled from this file.",
+      "required_evidence": {
+        "driver_axis_transform_derivation": true,
+        "individual_sensor_body_axis_sweep": false,
+        "combined_imu_stationary_consistency": false,
+        "ardupilot_motor_order_and_direction": false,
+        "unit_bootloader_and_recovery_verification": false,
+        "manual_hover_and_log_review": false
+      },
+      "note": "Experimental 4.7.2 Copter candidate under the same hardware-unvalidated prerelease policy as other targets. Do not infer flight readiness from matching MCU, a successful probe, a shared board ID, a 4.8.0-dev flight, or Betaflight qualification."
+    }
+  }
+}
