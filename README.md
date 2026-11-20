@@ -24,6 +24,10 @@ APB's default population is MPU6000 + ICM42605; the later variant is dual
 ICM42688P with its different SPI4 rotation. Select from actual chip markings,
 then verify physical axes. H7 upstream sensor assumptions remain unchanged.
 
+The [MRM2-10 AI compatibility status](docs/MRM2-10.md) distinguishes this
+repository's pinned APB build from the firmware observed on that airframe.
+Its airframe settings and tune are kept in a restricted review package.
+
 ## Fixes and improvements
 
 - Consolidate F405's two aliases for one physical SPI1 IMU into one device,
