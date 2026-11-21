@@ -1,5 +1,9 @@
 # Propellers-off acceptance
 
+For a fully disarmed APB **logging-only** run, use the
+[APB logging acceptance checklist](../companion/apb/BENCH_ACCEPTANCE.md).
+The broader output/arming/flight checks below are separate work.
+
 Software builds are not hardware qualification. Record board revision, IMU
 markings, bootloader ID/layout, upstream and port commits, manifest, settings
 backup, power source and media model before testing.

@@ -1,0 +1,312 @@
+{
+  "audit_date": "2026-10-24",
+  "release_url": "https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/v0.1.0-rc2",
+  "verification": {
+    "repository": "Orqa_ArduPilot_Ports",
+    "tag": "v0.1.0-rc2",
+    "port_revision": "ee71ab28c3a90791a442ffdb0397f9d78245fb9b",
+    "assets_downloaded": 35,
+    "checksum_entries_verified": 34,
+    "manifests_verified": 8,
+    "source_input_hash_comparisons": 192,
+    "generated_bootloader_inputs_verified": [],
+    "companion_files_match_tag": 16,
+    "full_source_files_match_tag": 39,
+    "clean_and_repeat_staging": "PASS",
+    "firmware_payloads_verified": [
+      "quadcore-copter.bin",
+      "wingcore-plane.bin",
+      "f405-copter.bin",
+      "f405-plane.bin",
+      "apb-copter.bin",
+      "apb-plane.bin",
+      "apb-icm42688-copter.bin",
+      "apb-icm42688-plane.bin"
+    ],
+    "hardware_tested": false,
+    "companion_sha256": "f83c54062ff1db089882c842fd515897f5aec45c2f589d81e97f2fae0b9be3ee"
+  },
+  "assets": [
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-copter.apj",
+      "size": 1314579,
+      "sha256": "7f4bc86ee1643668ac93b3300f9ad5b67663b680af12ee9e269d7b85cc1e944a",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-copter.bin",
+      "size": 1485368,
+      "sha256": "c6d5c0630eb169173f25db91d2d88a77a983c0e33c519e9ee7a9f6e6894ba147",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-copter.elf",
+      "size": 2891340,
+      "sha256": "b0aca0a077cdcaecccd012f3f83f707fcc7f4b4e6212b2d4240a0ef539635332",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-copter.manifest.json",
+      "size": 7267,
+      "sha256": "0e1de8bbdfdfcd552be1b377aa4d6112e71231df80ebbf2ab94766973232fd89",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-copter.apj",
+      "size": 1309644,
+      "sha256": "991ee0d82f8be5d0049a33f0b6452794a65a0f7042f02c7396a2fe4725d95f64",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-copter.bin",
+      "size": 1478776,
+      "sha256": "b52f2ec5db4f841a7640240dc44191eba8023a84fde259d2d4bf2051ef299f12",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-copter.elf",
+      "size": 2885136,
+      "sha256": "53c0129bc3d3dc1c43d7fc5eeb97ab9070c56f6cc1065e716a4cc0d5f2900e34",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-copter.manifest.json",
+      "size": 7312,
+      "sha256": "cf5e6e5718f3116dca30e6fa1ab5db46289516db1cf9cf7860b85df27afa9b55",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-plane.apj",
+      "size": 1309540,
+      "sha256": "4bda749ba98cd5c3277b41f6f1efed04dc4711ffc5b2bf0b64c95ffd83973980",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-plane.bin",
+      "size": 1470924,
+      "sha256": "1d47911704ad5190947038de81ae1f1933851e9a1969695eb065bb140663d426",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-plane.elf",
+      "size": 2848560,
+      "sha256": "7437f87e18d0d814eb19152c39d22efa3a382cf7de34cbbc9195f261781f037b",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-icm42688-plane.manifest.json",
+      "size": 7307,
+      "sha256": "83e486e41b4578b6100689ba1ee2cbbd42e71a0ac00a88e31f6a89cb61ea8439",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-plane.apj",
+      "size": 1315651,
+      "sha256": "09a1ea7575a4f5a913381888c3a8bca36dcde407c0dc8962f0cdae7e66f2f99b",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-plane.bin",
+      "size": 1478644,
+      "sha256": "d69e5e57fef367a775035ec1b7a1ea869e0669e907e27264906f4752ae673d3a",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-plane.elf",
+      "size": 2854776,
+      "sha256": "425000ec76f9c488a9a3cf5b05316ef8e0df81c3267549558cb101221731be74",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "apb-plane.manifest.json",
+      "size": 7262,
+      "sha256": "1b3ea81427aac9cefa78494d70a3f81ff2d00f46c34b7757695af57401e4e5e1",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "companion-apb.tar.gz",
+      "size": 31998,
+      "sha256": "f83c54062ff1db089882c842fd515897f5aec45c2f589d81e97f2fae0b9be3ee",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-copter.apj",
+      "size": 789996,
+      "sha256": "784095748184b51dffa372241a15858bd12cf024c1cb025d81fa28f1a76e4c1d",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-copter.bin",
+      "size": 863552,
+      "sha256": "4ac4427c2802b6d1c198abab122d04780431d12dc6bd080e46663b1e4bb2ec7e",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-copter.elf",
+      "size": 1578564,
+      "sha256": "b288789dfadab089ce22a265089866544aed4887935f1099cefe8c8a407bde8a",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-copter.manifest.json",
+      "size": 7275,
+      "sha256": "6ca80cf7edd2923ab8c8c48e1dd11b2f7613fca57758746f59d64aafa91b1e2e",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-plane.apj",
+      "size": 841839,
+      "sha256": "e57138819d5aa233ac863ca67115240731be25178fadfaee915e36d38bca8bcf",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-plane.bin",
+      "size": 916032,
+      "sha256": "7ad52a8d43ddaa79cf0f92d37e590a91f622da56f8c29ada9355421bf06b1ca4",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-plane.elf",
+      "size": 1658628,
+      "sha256": "2df45a12b199c33d673f03c09bd6ba0de9b22fa55510801e5153cb3dfe2daa22",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "f405-plane.manifest.json",
+      "size": 7269,
+      "sha256": "8c55146980fa9e8b7fbd08a415a4527e391470857aa67b0c5be35a3b7373f6b3",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "port-source.tar.gz",
+      "size": 71578,
+      "sha256": "4a7633d3d7fd8f7f094857a47cb73282d0570968b1d2b22f0febe14c71bb5631",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "quadcore-copter.apj",
+      "size": 1390078,
+      "sha256": "122a12ef46c1914b8c0fb2431c9b1d2da2475105cdad04d8d9479e01e3bdeb32",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "quadcore-copter.bin",
+      "size": 1548908,
+      "sha256": "fbaf834a1719b4962959474d4a9f0647e908ab3eb47cb9b58eac39b7943c5b99",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "quadcore-copter.elf",
+      "size": 2971996,
+      "sha256": "aeb90267d2f9213f81ea5a880bf32b43c9d483a9e93f8956eacbea4fe4fa65cf",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "quadcore-copter.manifest.json",
+      "size": 7294,
+      "sha256": "784ed813127c90841778e0c1dd48bd9350416c285288e772165ad6ae7d9ea4cf",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "SHA256SUMS",
+      "size": 2948,
+      "sha256": "dddcce7e63ef490c20307350a207fc30ec714d4041a5ad0d56ae38f3aff4fc9b",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "wingcore-plane.apj",
+      "size": 1391562,
+      "sha256": "bd4b15cf21b8f7f721e3c0946047e4b29dfcddd70b015f5346c579b033dfa9db",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "wingcore-plane.bin",
+      "size": 1543456,
+      "sha256": "96d105e85d25ff3e7f2442723822483e81334c92ae4ef010cad10416186995e3",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "wingcore-plane.elf",
+      "size": 2936332,
+      "sha256": "9c5802b870a654885c61af67c5a6d560dd5f4e50493eddedfe98ddc2952764e1",
+      "api_match": true,
+      "size_match": true
+    },
+    {
+      "repo": "Orqa_ArduPilot_Ports",
+      "name": "wingcore-plane.manifest.json",
+      "size": 7289,
+      "sha256": "2cd30e9ee307ec51efe2ea1ef6d932a5c2a477fb84906eea51f5659628aa9a5c",
+      "api_match": true,
+      "size_match": true
+    }
+  ],
+  "physical_apb_tests": "NOT TESTED"
+}
