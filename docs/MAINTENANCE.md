@@ -45,6 +45,29 @@ ANG records per simulated second, logger rejected writes (`DSF.Dp`), and main
 loop rate (`PM.LR`). Repeat both at the same lower speedup if either misses the
 upstream 395–405/s range. Record the runner conditions with the results.
 
+#### Paired results, 23 November 2026
+
+Both pins were built for native Copter SITL on one Debian 13 x86-64 host with
+GCC 14.2 and Python 3.12.14. The unmodified upstream test ran twice per pin at
+each speed, reversing the order for the second trial. The last logged
+`DSF.Dp` is the cumulative count of rejected backend writes across message types.
+
+| Pin | Speedup | ANG records/s, trials 1 and 2 | Last DSF.Dp, trials 1 and 2 |
+| --- | --- | --- | --- |
+| 4.7.2 `fb773567` | 100× | 314.80, 247.29 | 6,930, 11,711 |
+| 4.7.3 `d9c5097c` | 100× | 328.91, 251.24 | 6,190, 9,697 |
+| 4.7.2 `fb773567` | 10× | 400.01, 400.01 | 0, 0 |
+| 4.7.3 `d9c5097c` | 10× | 400.06, 400.05 | 0, 0 |
+
+All recorded `PM.LR` samples were 399–400 Hz. High-speed simulation reproduced
+the logging loss on both pins. Both passed at 10× using the upstream tolerance.
+These runs exercised the host file backend. APB W25 logging remains a separate
+hardware check.
+
+With fresh simulator storage, `LOIT_OPTIONS` read 1 on 4.7.2 and 0 on 4.7.3.
+On 4.7.2 the test explicitly saved 0 and then 1. Booting 4.7.3 with a copy of
+that simulated EEPROM returned 1.
+
 ## Publish
 
 In Actions, manually run **Publish approved prerelease** from main, supplying
