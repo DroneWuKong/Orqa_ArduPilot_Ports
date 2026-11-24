@@ -15,7 +15,7 @@ The complete original build inputs were not recovered, so this file is a
 candidate source reference; it does not prove the exact read-back binary was
 built from that file.
 
-The pinned 4.7.2 and the 4.8.0-dev sources read the ICM42605 FIFO axes into
+The previously compared 4.7.2 and the 4.8.0-dev sources read the ICM42605 FIFO axes into
 `Vector3f` in the same order, then call the same backend orientation methods.
 Their `Vector3::rotate()` cases for these yaw rotations are unchanged:
 
@@ -32,7 +32,8 @@ motor mapping are not ArduPilot evidence.
 
 ## Build selection
 
-`apb-dual-icm42605-copter` is a separate **4.7.2 experimental candidate**. The board
+`apb-dual-icm42605-copter` is an experimental Copter build at the revision in
+[upstream.lock.json](../upstream.lock.json). The board
 overlay changes only the two IMU probe rotations; it inherits the generic APB
 pins, board ID 1189, and 384 KiB application offset. The old `apb-copter`
 target remains the mixed MPU6000/ICM42605 population; `apb-icm42688-copter`
@@ -52,7 +53,7 @@ hardware-unvalidated policy as other targets. CI does not establish axis,
 output or flight behavior.
 Do not use the existing v0.1.0-rc2 `apb-copter.apj` on this population.
 
-## Remaining checks before a 4.7.2 flight
+## Outstanding hardware checks for the candidate
 
 1. Preserve the current 4.8 APJ, full parameter/calibration backup, logs and
    a working recovery path. Check the actual unit's bootloader ID and upload
@@ -62,8 +63,8 @@ Do not use the existing v0.1.0-rc2 `apb-copter.apj` on this population.
    agree with physical body axes. Confirm their stationary readings agree.
 3. With props removed, verify the motor output-to-corner mapping and motor
    direction on this aircraft, then verify RC, mode, failsafe, compass/GPS,
-   logging, battery and prearm behavior. Confirm parameter migration against
-   4.7.2; do not blindly load the 4.8 parameter file into 4.7.2.
+   logging, battery and prearm behavior. Review parameter migration from the fielded 4.8 image to the selected
+   candidate using copies of the saved settings.
 4. Only after those checks, conduct a controlled manual hover and inspect its
    log for attitude, IMU clipping/vibration, motor saturation and failsafes.
 

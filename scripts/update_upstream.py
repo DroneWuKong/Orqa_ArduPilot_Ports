@@ -86,7 +86,7 @@ def main():
              "and all build manifests. Software checks do not establish hardware qualification.\n\n"
              f"Upstream: https://github.com/{config['repository']}/commit/{revision}\n\n"
              "AI-assisted repository tooling; human review required.")
-    # Token-created PRs do not trigger pull_request workflows. Dispatch explicitly.
+    # The token-created PR run awaits approval. Also build the candidate branch directly.
     gh("workflow", "run", "build.yml", "--repo", repo, "--ref", branch)
     print(url)
 

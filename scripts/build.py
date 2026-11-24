@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import struct
 import subprocess
@@ -173,6 +174,62 @@ def verify_elf_binary(elf, binary):
             raise ValueError("ELF and binary disagree")
 
 
+def hwdef_lines(path):
+    """Expand the reviewed board overlay as ArduPilot writes ROMFS hwdef.dat."""
+    for line in path.read_text().splitlines():
+        line = line.partition("#")[0].strip()
+        if not line:
+            continue
+        if line.split(None, 1)[0] == "include":
+            _, include = shlex.split(line)
+            yield from hwdef_lines(path.parent / include)
+        else:
+            yield line
+
+
+def romfs_table(elf):
+    from elftools.elf.elffile import ELFFile
+
+    # ArduPilot's ROMFS table contains five 32-bit fields per file on STM32.
+    with elf.open("rb") as stream:
+        symbols = ELFFile(stream).get_section_by_name(".symtab")
+        tables = symbols.get_symbol_by_name("_ZN8AP_ROMFS5filesE") if symbols else None
+        if not tables or len(tables) != 1:
+            raise ValueError("Missing or ambiguous APB ROMFS table")
+        return tables[0]["st_value"], tables[0]["st_size"]
+
+
+def verify_apb_hwdef(image, target, elf):
+    address, size = romfs_table(elf)
+    start = target["flash_start"]
+    entry = struct.Struct("<5I")
+    offset = address - start
+    if offset < 0 or size % entry.size or offset + size > len(image):
+        raise ValueError("Invalid APB ROMFS table bounds")
+    expected = "\n".join(hwdef_lines(ROOT / "boards" / target["board"] / "hwdef.dat")).encode()
+    matches = 0
+    for name, packed, unpacked, _, data in entry.iter_unpack(image[offset:offset + size]):
+        if name < start or not image.startswith(b"hwdef.dat\0", name - start):
+            continue
+        matches += 1
+        pos = data - start
+        if pos < 0 or not packed or pos + packed > len(image) or unpacked != len(expected):
+            raise ValueError("Embedded APB hwdef differs from reviewed overlay")
+        encoded = image[pos:pos + packed]
+        # Upstream supports raw DEFLATE and uncompressed null-terminated text.
+        if encoded == expected or encoded == expected + b"\0":
+            continue
+        decoder = zlib.decompressobj(-15)
+        try:
+            decoded = decoder.decompress(encoded, len(expected) + 1)
+        except zlib.error as exc:
+            raise ValueError("Invalid compressed APB hwdef") from exc
+        if decoded != expected or not decoder.eof or decoder.unused_data:
+            raise ValueError("Embedded APB hwdef differs from reviewed overlay")
+    if matches != 1:
+        raise ValueError("Expected exactly one embedded APB hwdef")
+
+
 def collect(source, target, config, out):
     if out.exists() and any(out.iterdir()):
         raise ValueError("Artifact directory must be empty; do not mix builds")
@@ -205,9 +262,15 @@ def collect(source, target, config, out):
         raw = zlib.decompress(base64.b64decode(apj["image"]))
         if apj["board_id"] != target["board_id"] or apj["image_size"] != len(raw):
             raise ValueError("APJ board ID or image size mismatch")
+        identity = apj.get("git_identity", "")
+        if (apj.get("summary") != target["board"] or not isinstance(identity, str)
+                or len(identity) < 8 or not config["revision"].startswith(identity)):
+            raise ValueError("APJ board name or upstream revision mismatch")
         if raw != binary.read_bytes():
             raise ValueError("APJ and binary disagree")
         verify_elf_binary(elf, binary)
+        if target.get("sensor_population"):
+            verify_apb_hwdef(raw, target, elf)
         originals = [binary, bundle, elf]
     data = binary.read_bytes()
     validate_image(data, target)

@@ -1,8 +1,8 @@
 {
   "kind": "ardupilot",
   "repository": "ArduPilot/ardupilot",
-  "tag": "Copter-4.7.2",
-  "revision": "fb773567896014da007bca58358704d4a0d8516f",
+  "tag": "Copter-4.7.3",
+  "revision": "d9c5097c3d8333435712ffed86bca8ce00c4bb46",
   "toolchain": {
     "version": "10.2.1",
     "url": "https://firmware.ardupilot.org/Tools/STM32-tools/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2",
