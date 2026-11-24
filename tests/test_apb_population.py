@@ -1,9 +1,14 @@
 import importlib.util
+import base64
 import json
 from pathlib import Path
+import struct
 import subprocess
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
+import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("build_population", ROOT / "scripts/build.py")
@@ -12,6 +17,43 @@ spec.loader.exec_module(build)
 
 
 class PopulationTests(unittest.TestCase):
+    def test_collector_rejects_another_board_with_the_same_factory_id(self):
+        config = build.lock()
+        target = next(t for t in config["targets"] if t["id"] == "apb-dual-icm42605-copter")
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)
+            files = source / "build" / target["board"] / "bin"
+            files.mkdir(parents=True)
+            payload = b"mixed-board fixture"
+            (files / "arducopter.bin").write_bytes(payload)
+            (files / "arducopter").write_bytes(b"fixture ELF")
+            (files / "arducopter.apj").write_text(json.dumps({
+                "summary": "OrqaAPB", "board_id": 1189, "git_identity": config["revision"][:8],
+                "image_size": len(payload), "image": base64.b64encode(zlib.compress(payload)).decode(),
+            }))
+            with self.assertRaisesRegex(ValueError, "APJ board name"):
+                build.collect(source, target, config, source / "out")
+            self.assertEqual(list((source / "out").iterdir()), [])
+
+    def test_embedded_population_identity(self):
+        targets = {t["board"]: t for t in build.lock()["targets"] if t.get("sensor_population")}
+        for board, target in targets.items():
+            expected = "\n".join(build.hwdef_lines(ROOT / "boards" / board / "hwdef.dat")).encode()
+            compressor = zlib.compressobj(wbits=-15)
+            packed = compressor.compress(expected) + compressor.flush()
+            start = target["flash_start"]
+            name = b"hwdef.dat\0"
+            table = struct.pack("<5I", start + 20, len(packed), len(expected), 0, start + 20 + len(name))
+            image = table + name + packed
+            with patch.object(build, "romfs_table", return_value=(start, len(table))):
+                for other_board, selected in targets.items():
+                    with self.subTest(embedded=board, selected=other_board):
+                        if board == other_board:
+                            build.verify_apb_hwdef(image, selected, None)
+                        else:
+                            with self.assertRaisesRegex(ValueError, "Embedded APB hwdef"):
+                                build.verify_apb_hwdef(image, selected, None)
+
     def test_existing_population_selects_matching_target_without_promoting_qualification(self):
         result = build.verify_sensor_population("apb-mpu6000-icm42605", "apb-copter", build.lock())
         self.assertFalse(result["hardware_qualified"])

@@ -29,7 +29,7 @@ then verify physical axes. H7 upstream sensor assumptions remain unchanged.
 
 A flying MRM2-10 running a separate 4.8.0-dev build reports **two ICM42605
 sensors**, a third population distinct from the original APB variants. The
-4.7.2 `apb-dual-icm42605-copter` target copies candidate rotations from the
+`apb-dual-icm42605-copter` target copies candidate rotations from the
 retained 4.8-associated board definition. It follows the same experimental
 release policy as other targets; it has not been flight-tested. Flight of the
 different 4.8 image does not validate this one. Do not substitute a mixed-IMU
@@ -42,7 +42,7 @@ chip population. The dual-ICM42605 candidate is built in CI and included in
 tagged prerelease firmware bundles under the same hardware-unvalidated label.
 Existing APB variants remain available for their declared populations.
 
-The [MRM2-10 AI compatibility status](docs/MRM2-10.md) distinguishes the 4.7.2
+The [MRM2-10 AI compatibility status](docs/MRM2-10.md) distinguishes the pinned
 source builds from the [exact installed 4.8.0-dev readback prerelease](https://github.com/DroneWuKong/Orqa_ArduPilot_Ports/releases/tag/mrm2-10-4.8.0-dev-0922bced-readback).
 The owner reports repeated flights with that 4.8 image. Its airframe settings
 and tune remain in a restricted Orqa review package.
@@ -106,8 +106,8 @@ Never load an APB image onto another board just because its ID is 1189.
 
 ## Build (Linux x86_64)
 
-Pinned stable base: Copter/Plane 4.7.2 at the same upstream commit.
-Exact compiler, source and targets: [upstream.lock.json](upstream.lock.json).
+[upstream.lock.json](upstream.lock.json) identifies the current Copter and Plane
+source revision, compiler and build targets. Both vehicle tags must resolve to that revision.
 
 ~~~sh
 python3 -m venv .venv

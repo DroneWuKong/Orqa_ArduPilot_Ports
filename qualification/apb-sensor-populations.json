@@ -57,7 +57,7 @@
         "unit_bootloader_and_recovery_verification": false,
         "manual_hover_and_log_review": false
       },
-      "note": "Experimental 4.7.2 Copter candidate under the same hardware-unvalidated prerelease policy as other targets. Do not infer flight readiness from matching MCU, a successful probe, a shared board ID, a 4.8.0-dev flight, or Betaflight qualification."
+      "note": "Experimental Copter candidate at the revision in upstream.lock.json under the same hardware-unvalidated prerelease policy as other targets. Do not infer flight readiness from matching MCU, a successful probe, a shared board ID, a 4.8.0-dev flight, or Betaflight qualification."
     }
   }
 }
